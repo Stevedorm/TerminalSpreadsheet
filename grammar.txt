@@ -1,0 +1,60 @@
+#Used https://www.geeksforgeeks.org/precedence-and-associativity-of-operators-in-python/
+expression = level0
+
+level0 = level0 "or" level1
+       | level1
+level1 = level1 "and" level2
+       | level2
+level2 = "not" level2
+       | level3
+level3 = level3 "<" level4
+       | level3 "<=" level4
+       | level3 ">" level4
+       | level3 ">=" level4
+       | level3 "!=" level4
+       | level3 "==" level4
+       | level4
+level4 = level4 "&" level5
+       | level4 "|" level5
+       | level4 "^" level5
+       | level5
+level5 = level5 ">>" level6
+       | level5 "<<" level6
+       | level6
+level6 = "~" level6
+       | level7
+level7 = level7 "+" level8
+       | level7 "-" level8
+       | level8
+level8 = level8 "*" level9
+       | level8 "/" level9
+       | level8 "%" level9
+       | level9
+level9 = level10 "**" level9
+        | level9
+level10 = "-" level10
+        | levelN
+levelN = INT
+        | FLOAT
+        | BOOLEAN
+        | STRING
+        | cell_addr
+        | parentheses
+        | int-to-float
+        | float-to-int
+        | sum
+        | max
+        | min
+        | mean
+        | cellRvalue
+        | cellLvalue
+int-to-float = "float(" levelN ")"
+float-to-int = "int(" levelN ")"
+sum = "sum([" levelN "," levelN "], [" levelN "," levelN "])"
+min = "min([" levelN "," levelN "], [" levelN "," levelN "])"
+max = "max([" levelN "," levelN "], [" levelN "," levelN "])"
+mean = "mean([" levelN "," levelN "], [" levelN "," levelN "])"
+cellRValue = "#[" levelN ", " levelN "]"
+cellLValue = "[" levelN ", " levelN "]"
+parentheses = "(" levelN "," levelN ")"
+cell_addr = "(" INT "," INT ")"
