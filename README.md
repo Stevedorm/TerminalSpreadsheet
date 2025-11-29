@@ -91,6 +91,37 @@ The parser uses a precedence ladder with at least five levels so expressions lik
 ```box
 5 + 2 * 3 ** 2
 ```
+
+## Project Files
+
+```text
+.
+├── README.md                # Project overview and usage instructions
+
+├── vex_ast.rb               # AST node hierarchy (expressions, statements, control flow, functions)
+├── runtime.rb               # Core runtime environment (variables, state)
+├── variable_runtime.rb      # Variable / environment management helpers
+├── evaluate.rb              # Evaluator visitor: walks AST and produces primitive values
+├── serialize.rb             # Serializer / pretty-printer visitor for ASTs
+
+├── token.rb                 # Token abstraction (type, lexeme, source locations)
+├── lexer.rb                 # Lexer: source text → list of tokens
+├── parser.rb                # Recursive-descent parser: tokens → AST
+├── grammar.txt              # Box language grammar in BNF form
+
+├── grid.rb                  # Spreadsheet-style grid model
+├── cell.rb                  # Individual cell representation and behavior
+
+├── TUIClass.rb              # Main curses-based TUI components
+├── drawing_utils.rb         # Helpers for drawing windows, boxes, and UI elements
+├── runtui.rb                # Entry point for launching the terminal UI
+
+├── main.rb                  # Simple CLI entry point / demo runner
+├── demonstrate_errors.rb    # Script to showcase error handling and messages
+
+├── milestonetests.rb        # Milestone 1 tests (model / evaluation)
+└── milestone2tests.rb       # Milestone 2 tests (lexer, parser, interpreter)
+```
 ## Acknowledgments
 
 This was a partner project, where <a href='https://github.com/jryder-nvr'>John Ryder</a> and I worked together to complete this project.
