@@ -1,65 +1,92 @@
-# TerminalSpreadsheet 🧮
+# TerminalSpreadsheet (Box Project)
 
-A lightweight, terminal-based spreadsheet tool written in Python.  
-TerminalSpreadsheet allows you to view, edit, and manipulate tabular data (CSV or custom delimited) right from the command line — perfect for quick edits, automation scripts, or remote environments without a GUI.
+This repository contains my **Box** project: a terminal-based “spreadsheet-style” coding environment with its own tiny programming language, implemented in **Ruby**.
+
+Under the hood, the project is a miniature interpreter:
+
+* an **abstract syntax tree (AST)** model for expressions and statements  
+* a **runtime environment** that stores variables and functions  
+* a **lexer & parser** that turn source code into ASTs  
+* a **curses-based terminal UI** that lets you edit and run code in a “box” in the terminal
+
+The project was developed in four milestones:
+
+1. **Model** – AST & runtime
+2. **Interpreter** – lexer, parser, evaluator
+3. **Interface** – curses TUI
+4. **Control Flow** – conditionals, loops, and functions
+
+---
 
 ## Table of Contents
 
-- [Features](#features)  
-- [Why TerminalSpreadsheet?](#why-terminals­preadsheet)  
-- [Requirements](#requirements)  
-- [Installation](#installation)  
-- [Usage](#usage)  
-  - [Run from file](#run-from-file)  
-  - [Interactive mode (REPL)](#interactive-mode-repl)  
-- [Keybindings & Commands](#keybindings--commands)  
-- [Example Session](#example-session)  
-- [Contributing](#contributing)  
-- [License](#license)  
-- [Authors & Acknowledgments](#authors--acknowledgments)
+- [Language Overview](#language-overview)
+  - [Primitives](#primitives)
+  - [Operators](#operators)
+  - [Blocks & Statements](#blocks--statements)
+  - [Control Flow](#control-flow)
+  - [Functions](#functions)
+- [Architecture](#architecture)
+  - [Milestone 1 – Model](#milestone-1--model)
+  - [Milestone 2 – Interpreter](#milestone-2--interpreter)
+  - [Milestone 3 – Interface](#milestone-3--interface)
+  - [Milestone 4 – Control Flow](#milestone-4--control-flow)
+- [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Running the TUI](#running-the-tui)
+  - [Running Tests / Examples](#running-tests--examples)
+- [Project Files](#project-files)
+- [Acknowledgments](#acknowledgments)
 
 ---
 
-## Features
+## Language Overview
 
-- ✅ Open and edit CSV or delimited text data in the terminal  
-- ✅ Move around cells, rows, columns  
-- ✅ Add / remove rows or columns  
-- ✅ Save modified data back to disk  
-- ✅ Simple editing: change cells, insert values, delete data  
-- ✅ Works on any system with Python — no GUI required  
-- ✅ Keyboard-driven: minimal dependencies, fast interaction  
+Box is a small, dynamically-typed language designed for coding-challenge style problems, backed by an AST and visitor pattern.
 
----
+### Primitives
 
-## Why TerminalSpreadsheet?
+The evaluator works with five primitive node types:
 
-Sometimes you don’t need or don’t have access to a full GUI spreadsheet (Excel, LibreOffice, Google Sheets).  
+- `int` – integer values
+- `float` – floating-point values
+- `bool` – `true` / `false`
+- `string` – text
+- `null` – absence of value
 
-- Remote servers, SSH sessions, or containers may lack a GUI.  
-- Quick tweaks to CSV files — especially when automating workflows.  
-- Light memory footprint, no heavy dependencies.  
-- Terminal-first design — integrates nicely into existing command-line workflows.  
+All evaluation returns one of these model primitives (never raw Ruby types from the outside world).
 
-TerminalSpreadsheet fills that niche by giving you spreadsheet-like editing within a terminal UI.
+### Operators
 
----
+**Arithmetic**
 
-## Requirements
+- `+  -  *  /  %` – addition, subtraction, multiplication, division, modulo
+- `**` – exponentiation
+- unary `-` – numeric negation
 
-- Ruby  
-- (Optional) `pip install --user curses` / `windows-curses` if you’re on Windows and using the curses-based interface  
+**Logical**
 
----
+- `&&` – logical and
+- `||` – logical or
+- `!` – logical not
 
-## Installation
+**Bitwise**
 
-```bash
-git clone https://github.com/Stevedorm/TerminalSpreadsheet.git
-cd TerminalSpreadsheet
-# Optionally, create a virtual environment:
-python3 -m venv venv
-source venv/bin/activate     # on macOS / Linux
-venv\Scripts\activate        # on Windows (PowerShell/CMD)
-pip install --upgrade pip
+- `&  |  ^` – bitwise and, or, xor
+- `~` – bitwise not
+- `<<  >>` – left and right shift
 
+**Relational**
+
+- `==  !=  <  <=  >  >=`
+
+**Casts**
+
+- `int(x)` – cast to integer
+- `float(x)` – cast to float
+
+The parser uses a precedence ladder with at least five levels so expressions like:
+
+```box
+5 + 2 * 3 ** 2
