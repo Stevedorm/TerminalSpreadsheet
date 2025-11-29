@@ -90,3 +90,7 @@ The parser uses a precedence ladder with at least five levels so expressions lik
 
 ```box
 5 + 2 * 3 ** 2
+```
+## Acknowledgments
+
+This was a partner project, where <a href='https://github.com/jryder-nvr'>John Ryder</a> and I worked together to complete this project.
