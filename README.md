@@ -167,7 +167,7 @@ Execution:
 
 AST form:
 
-`VexAST::ForEach.new(iter_name, range_op, start_address, end_address, block)`
+- `VexAST::ForEach.new(iter_name, range_op, start_address, end_address, block)`
 ---
 
 ### Functions
@@ -232,6 +232,7 @@ Features:
 
 <li>Runtime manages variable bindings and function definitions</li>
 </ul>
+
 ## Milestone 2 – Interpreter
 
 Key files:
