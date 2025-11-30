@@ -86,11 +86,238 @@ All evaluation returns one of these model primitives (never raw Ruby types from 
 - `int(x)` – cast to integer
 - `float(x)` – cast to float
 
-The parser uses a precedence ladder with at least five levels so expressions like:
+The parser uses a precedence ladder (see `Parser#level8` … `levelN`) so expressions like:
 
 ```box
 5 + 2 * 3 ** 2
 ```
+are parsed correctly as 5 + (2 * (3 ** 2))
+
+### Blocks & Statements
+
+A **block** is a sequence of statements evaluated top-to-bottom:
+```box
+block
+x = 10
+y = x * 2
+end
+```
+
+
+- Returns the **value of the final statement**
+- AST form: `VexAST::Block.new(statements_array)`
+
+Assignments:
+```box
+x = 5 + 3
+```
+
+Variables:
+```box
+x
+```
+
+AST forms:
+
+- Assignment → `VexAST::Assignment.new(name, value)`
+- Variable → `VexAST::Variable.new(name)`
+---
+
+### Control Flow
+
+#### If / Else / End
+```box
+if x > 10
+x * 2
+else
+0
+end
+```
+
+Behavior:
+
+- Evaluates the condition  
+- Executes the `then` branch or the `else` branch  
+- Returns the branch value  
+
+AST form:
+
+`VexAST::Conditional.new(condition, then_node, else_node)`
+
+#### For-Each Loop (Cell Window Iteration)
+
+Iterates through a rectangular region of spreadsheet cells:
+```box
+for v in [1, 1]..[3, 3]
+v + 1
+end
+```
+
+Range operators:
+
+- `..` → inclusive range  
+- `...` → exclusive range  
+
+Execution:
+
+- Iterates each cell in the rectangle  
+- Binds iterator variable (`v`) to each cell’s value  
+- Evaluates the block once per cell  
+- Returns the **last evaluation result**
+
+AST form:
+
+`VexAST::ForEach.new(iter_name, range_op, start_address, end_address, block)`
+---
+
+### Functions
+
+#### Type Casts
+```box
+int(x)
+float(x)
+```
+
+AST:
+
+- `VexAST::FloatToInt`
+- `VexAST::IntToFloat`
+
+#### Range-Based Statistical Functions
+
+Operate on two cell-address pairs:
+```box
+=sum([1,1], [3,3])
+=min([1,1], [3,3])
+=max([1,1], [3,3])
+=mean([1,1], [3,3])
+```
+
+AST:
+
+- `VexAST::Sum`
+- `VexAST::Min`
+- `VexAST::Max`
+- `VexAST::Mean`
+
+#### Cell Access
+
+Get a cell’s value:
+
+#[row, col]
+
+→ `VexAST::CellRValue`
+
+Get a cell address literal:
+
+[row, col]
+
+→ `VexAST::CellLValue`
+
+## Architecture
+
+## Milestone 1 – Model
+
+Key files:
+<ul>
+<li>vex_ast.rb – node hierarchy (primitives, ops, statements, blocks, control flow, functions)</li>
+
+<li>runtime.rb / variable_runtime.rb – runtime environment for variables and functions</li>
+</ul>
+Features:
+<ul>
+<li>Abstract syntax tree with a common visit method on each node</li>
+
+<li>Visitor pattern used for serialization and evaluation</li>
+
+<li>Runtime manages variable bindings and function definitions</li>
+</ul>
+## Milestone 2 – Interpreter
+
+Key files:
+<ul>
+<li>grammar.txt – BNF grammar for the Box language (with precedence ladder)</li>
+
+<li>token.rb – token abstraction (type, lexeme, source indices)</li>
+
+<li>lexer.rb – converts source text into a flat list of tokens</li>
+
+<li>parser.rb – recursive descent parser builds AST out of tokens</li>
+</ul>
+The parser has helper methods:
+<ul>
+<li>parse – entry point for a program</li>
+
+<li>has(type) – check current token type</li>
+
+<li>advance – move forward</li>
+</ul>
+
+Left-associative operators are implemented with loops, right-associative with recursion. Parsing errors raise exceptions that include source locations.
+
+## Milestone 3 – Interface
+
+Key files:
+<ul>
+<li>TUIClass.rb</li>
+
+<li>drawing_utils.rb</li>
+
+<li>grid.rb, cell.rb</li>
+
+<li>runtui.rb</li>
+</ul>
+
+The interface uses a Curses-style TUI to show:
+<ul>
+<li>A box where the user writes code in the Box language</li>
+
+<li>A table of test cases (parameters and expected vs actual return values)</li>
+
+<li>A panel to display printed output or error messages</li>
+
+<li>Controls to run the program and update the table</li>
+</ul>
+
+## Milestone 4 – Control Flow
+
+Final milestone adds:
+<ul>
+<li>Conditional, while, and for-each loop node types</li>
+
+<li>Function definition, call, and return nodes</li>
+
+<li>Support in the lexer, parser, and evaluator</li>
+
+<li>Extended runtime (function table + lexical scope for calls)</li>
+</ul>
+
+## Getting Started
+
+## Requirements
+
+Ruby (2.7+ works fine)
+
+A Curses implementation for Ruby (On many systems you can just <strong>gem install curses</strong>)
+
+## Installation
+
+git clone https://github.com/Stevedorm/TerminalSpreadsheet.git
+cd TerminalSpreadsheet
+
+# Install curses if needed
+gem install curses
+
+## Running the TUI
+
+ruby runTUI.rb  # launch the Box / spreadsheet TUI
+
+## Running Tests / Examples
+
+ruby milestonetests.rb      # milestone 1 model tests
+ruby milestone2tests.rb     # lexer/parser/evaluator tests
+ruby demonstrate_errors.rb  # shows error handling & messages
+
 
 ## Project Files
 
